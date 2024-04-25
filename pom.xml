@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.1.11</version>
+		<version>3.2.4</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.tpe</groupId>
@@ -14,7 +14,8 @@
 	<name>spring-jwt</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>22</java.version>
+		<jjwt.version>0.12.5</jjwt.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -64,6 +65,14 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<!-- jjwt is a library used to generate and validate jwt token. there are some other libs -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt-api</artifactId>
+			<version>${jjwt.version}</version>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>
