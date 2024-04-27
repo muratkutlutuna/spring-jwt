@@ -1,5 +1,6 @@
 package com.tpe.config;
 
+import com.tpe.security.AuthTokenFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -30,7 +32,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain configure(HttpSecurity http)throws Exception{
 
-        return http.csrf(AbstractHttpConfigurer::disable)
+        http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(httpSecuritySessionManagementConfigurer ->
                         httpSecuritySessionManagementConfigurer
                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))// because we are creating restful API
@@ -38,9 +40,19 @@ public class WebSecurityConfig {
                     auth.requestMatchers("/register", "/login").permitAll()
                             .anyRequest().authenticated();
                 })
-                .httpBasic(Customizer.withDefaults())
-                .build();
-        //TODO: AuthTokenFilter will be added
+                .httpBasic(Customizer.withDefaults());
+
+        //to insert the custom authTokenFilter before the built-in
+        //UsernamePasswordAuthenticationFilter in the filter chain.
+        http.addFilterBefore(authTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+
+    }
+
+    @Bean
+    public AuthTokenFilter authTokenFilter() {
+        return new AuthTokenFilter();
     }
 
     @Bean
@@ -53,7 +65,6 @@ public class WebSecurityConfig {
         //this is another way to introduce userDetails and Password to AuthManager
         return authenticationConfiguration.getAuthenticationManager();
     }
-
 
 
 }

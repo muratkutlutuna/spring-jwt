@@ -5,9 +5,13 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -34,17 +38,26 @@ public class AuthTokenFilter extends OncePerRequestFilter {
         //getToken from header
         String jwtToken = getTokenFromHeader(request);
 
-        //validate tokeb
-        if (jwtToken != null && jwtProvider.validateToken(jwtToken)) {
-            String userName = jwtProvider.extractUserNameFromJwToken(jwtToken);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(userName);//user which is recognized by security
-            UsernamePasswordAuthenticationFilter authentication =
-                    new UsernamePasswordAuthenticationFilter(
-//                            userDetails,
-//                            null,
-//                            userDetails.getAuthorities()
-                    ); //TODO: resolve the issue 1:02:55
+        //validate token
+        try {
+            if (jwtToken != null && jwtProvider.validateToken(jwtToken)) {
+                String userName = jwtProvider.extractUserNameFromJwToken(jwtToken); //extract user from token
+                UserDetails userDetails = userDetailsService.loadUserByUsername(userName);//get security recognized user //user which is recognized by security
+
+                //to place logged user into security context we need to use UsernamePasswordAuthenticationToken
+                UsernamePasswordAuthenticationToken authentication =
+                        new UsernamePasswordAuthenticationToken(
+                                userDetails, //authenticated user
+                                null, //if we need extra data about the user we can add here
+                                userDetails.getAuthorities() //role of user
+                        );
+                SecurityContextHolder.getContext().setAuthentication(authentication); //place authenticated user in security context
+            }
+        } catch (UsernameNotFoundException e) {
+            e.printStackTrace();
         }
+        //This allows subsequent filters to perform their operations before reaching the final resource
+        filterChain.doFilter(request,response);
 
     }
 
@@ -56,5 +69,22 @@ public class AuthTokenFilter extends OncePerRequestFilter {
             return header.substring(7);
         }
         return null;
+    }
+
+    /**
+     * --> "permitAll" is used to explicitly allow unauthenticated access to a resource or
+     * endpoint, bypassing authentication and authorization checks.
+     * --> "shouldNotFilter" is used to specify that a specific filter should not be applied to a particular request,
+     * bypassing the execution of that filter for the matching request.
+     *
+     * @param request
+     * @return
+     * @throws ServletException
+     */
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        AntPathMatcher antMatcher = new AntPathMatcher();
+        return antMatcher.match("/register",request.getServletPath()) ||
+                antMatcher.match("/login",request.getServletPath());
     }
 }
