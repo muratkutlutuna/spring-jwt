@@ -20,6 +20,6 @@ public class UserDetailServiceImpl implements UserDetailsService {
                 ()-> new ResourceNotFoundException("User with username: "+username+" not found!")
         );
         //returning userDetails obj from User entity class because security only understand this object
-        return UserDetailImpl.build(user);
+        return UserDetailsImpl.build(user);
     }
 }

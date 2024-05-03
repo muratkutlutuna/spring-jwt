@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDetailImpl implements UserDetails {
+public class UserDetailsImpl implements UserDetails {
 
     private Long id;
     private String userName;
@@ -26,13 +26,13 @@ public class UserDetailImpl implements UserDetails {
     //it will be invisible
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
-    public static UserDetailImpl build(User user){
+    public static UserDetailsImpl build(User user){
         //convert role to SimpleGrantedAuthority
         List<SimpleGrantedAuthority> authorities = user.getRoles().stream().map(
                 role-> new SimpleGrantedAuthority(role.getName().name())
         ).collect(Collectors.toList());
         //we returning UserDetailImpl object
-        return new UserDetailImpl(user.getId(), user.getUserName(), user.getPassword(), authorities);
+        return new UserDetailsImpl(user.getId(), user.getUserName(), user.getPassword(), authorities);
     }
 
 

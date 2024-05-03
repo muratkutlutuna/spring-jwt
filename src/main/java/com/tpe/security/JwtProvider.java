@@ -1,10 +1,8 @@
 package com.tpe.security;
 
-import com.tpe.security.service.UserDetailImpl;
+import com.tpe.security.service.UserDetailsImpl;
 import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SecureDigestAlgorithm;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.Jwts;
@@ -20,7 +18,7 @@ public class JwtProvider {
             3. extract userName from JW Token
      */
 
-    private String jwtSecretKey = "sboot"; //secret key will be used to generate/parse token
+    private String jwtSecretKey = "sbootasdfa65754sfgdfgrhtndfghnergz567sdfbsdgns6rthnd6f6gh6sdfgsgd76sfghfghg8bsdfg9bsdfbgsdfbsdfgb"; //secret key will be used to generate/parse token
     private long jwtExpiration = 86400000; //24*60*60*1000 = 24 hours
 
     //*********************** GENERATE JW TOKEN **************************
@@ -33,7 +31,7 @@ public class JwtProvider {
 
     public String createToken(Authentication authentication) {
         //getPrincipal method will give us currently logged-in user
-        UserDetailImpl userDetail = (UserDetailImpl) authentication.getPrincipal();
+        UserDetailsImpl userDetail = (UserDetailsImpl) authentication.getPrincipal();
 
         return  Jwts.builder().subject(userDetail.getUsername())// username of logged-in / authenticated user
                 .issuedAt(new Date()) //when jwt is generated

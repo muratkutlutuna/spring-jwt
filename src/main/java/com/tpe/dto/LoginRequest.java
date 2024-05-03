@@ -1,5 +1,15 @@
 package com.tpe.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
+@Data
 public class LoginRequest {
-    //TODO: Sprin security class first lecture 2:33:05
+    @NotBlank
+    @NotNull
+    private String userName;
+    @NotBlank
+    @NotNull
+    private String password;
 }

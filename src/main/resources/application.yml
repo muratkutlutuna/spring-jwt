@@ -2,9 +2,10 @@ server:
   port: 8080
 
   error:
+    include-white-label: always
     include-binding-errors: always
     include-message: always
-    include-stacktrace: never
+    include-stacktrace: always
 
     #servlet:
     #context-path: /api/v0
